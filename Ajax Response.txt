@@ -1,0 +1,235 @@
+ <script type = "text/javascript">
+    function GetDropDownData() {
+        var myDropDownList = $('.myDropDownLisTId');
+
+        $.ajax({
+            type: "POST",
+            url: "test.aspx/GetDropDownDataWM",
+            data: '{name: "abc" }',
+            contentType: "application/json; charset=utf-8",
+            dataType: "json",
+            success: function (data) {
+                $.each(jQuery.parseJSON(data.d), function () {
+                    myDropDownList.append($("<option></option>").val(this['FieldDescription']).html(this['FieldCode']));
+                });
+            },
+            failure: function (response) {
+                alert(response.d);
+            }
+        });
+    }
+    function OnSuccess(response) {
+        console.log(response.d);
+        alert(response.d);
+    }
+</script>----------------------------------------------------------
+[System.Web.Services.WebMethod]
+         public static string GetDropDownDataWM(string name)
+         {
+             //return "Hello " + name + Environment.NewLine + "The Current Time is: "
+             //    + DateTime.Now.ToString();
+
+             var msg = "arbaaz";
+
+             string[] name1 = new string[1];
+             string[] Value = new string[1];
+             name1[0] = "@Empcode";
+             Value[0] = HttpContext.Current.Session["LoginUser"].ToString().Trim();
+             DataSet ds = new DataSet();
+             dboperation dbo = new dboperation();
+             ds = dbo.executeProcedure("GetDropDownsForVendor", name1, Value, 1);
+
+             return ds.GetXml(); 
+
+         }--------------------------------------------------------------
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+using System.Collections.Generic;
+using System.Linq;
+using System.Web;
+using System.Web.Services;
+using System.Data;
+using System.Collections;
+using System.Text;
+using DataAccessLayer;
+using BusinessAccessLayer;
+using System.Data.SqlClient;
+using System.Configuration;
+using System.Web.Script.Services;
+using System.IO;
+using System.Web.Script.Serialization;
+using BusinessLogicLayer;
+
+namespace ITSchoolERP
+{
+    /// <summary>
+    /// Summary description for CommonWebServiceNew
+    /// </summary>
+    [WebService(Namespace = "http://tempuri.org/")]
+    [WebServiceBinding(ConformsTo = WsiProfiles.BasicProfile1_1)]
+    [System.ComponentModel.ToolboxItem(false)]
+    // To allow this Web Service to be called from script, using ASP.NET AJAX, uncomment the following line. 
+    [System.Web.Script.Services.ScriptService]
+    public class CommonWebServiceNew : System.Web.Services.WebService
+    {
+   
+
+
+[WebMethod]
+        public List<object[]> BindStudentInfoByStudentId(string schoolid, string SessionId, string studentid)
+        {
+            DataTable dt = new DataTable();
+            try
+            {
+                Hashtable hash = new Hashtable();
+                hash.Add("@SchoolId", Convert.ToInt32(schoolid));
+                hash.Add("@SessionId", Convert.ToInt32(SessionId));
+                hash.Add("@StudentId", Convert.ToInt32(studentid));
+                hash.Add("@Action", "FILLBYSTUDENTID");
+                dt = controller.FillDataTable("ERP_SearchStudentByNameForWebService", hash);
+
+                List<object[]> li = new List<object[]>(dt.Rows.Count + 1);
+                if (dt.Rows.Count > 0)
+                {
+                    for (int i = 0; i < dt.Rows.Count; i++)
+                    {
+                        object[] r1 = (object[])dt.Rows[i].ItemArray.ToArray();
+                        li.Add(r1);
+                    }
+                }
+                return li;
+            }
+            catch (Exception ex)
+            {
+                List<object[]> li = new List<object[]>(0);
+                return li;
+            }
+        }
+
+
+
+
+
+
+
+
+
+
+
+  <script type="text/javascript">
+        function GetStudentInformation() {
+            debugger;
+           
+            if ($('#<%=txtadmnNo.ClientID %>').val().trim() == '' && $('#<%=txtStudentName.ClientID %>').val().trim() == '') {
+                validateError('<%=txtadmnNo.ClientID %>', "Please Select Auto Populated Admn. No. or Student Name");
+                $('#<%=txtadmnNo.ClientID %>').val('');
+                $('#<%=txtStudentName.ClientID %>').val('');
+                $('#<%=hdnadmnno_id.ClientID %>').val('');
+                $('#<%=hdnstdname_id.ClientID %>').val('');
+                return false;
+                
+            }
+            else
+                validateSuccess('<%=txtadmnNo.ClientID %>');
+
+            var schoolid = '<%= Session["SchoolID"]%>';
+            var SessionId = '<%= Session["CurrentSessionYearId"]%>';
+            var admnno = $('#<%=hdnadmnno_id.ClientID %>').val();
+            var stdname = $('#<%=hdnstdname_id.ClientID %>').val();
+            var studentid = "";
+            if (admnno != "")
+                studentid = $('#<%=hdnadmnno_id.ClientID %>').val();
+            else if (stdname != "")
+                studentid = $('#<%=hdnstdname_id.ClientID %>').val();
+
+        $.ajax({
+            type: "POST",
+            contentType: "application/json; charset=utf-8",
+            url: "../CommonWebServiceNew.asmx/BindStudentInfo",
+            data: "{schoolid:'" + schoolid + "',SessionId:'" + SessionId + "',studentid:'" + studentid + "'}",
+            dataType: "json",
+            success: function OnSuccess(data) {
+                try {
+                    $('#<%=txtStudentName.ClientID %>').val(data.d[0][1].toString());
+                    $('#<%=txtadmnNo.ClientID %>').val(data.d[0][2].toString());
+                    $('#<%=lblaltrAdmnNo.ClientID %>').text(data.d[0][3].toString());
+                    $('#<%=lblclass.ClientID %>').text(data.d[0][5].toString());
+                    $('#<%=lbldob.ClientID %>').text(data.d[0][4].toString());
+                    $('#<%=lblfname.ClientID %>').text(data.d[0][6].toString());
+                    $('#<%=lbldateofAdmn.ClientID %>').text(data.d[0][7].toString());
+                    $('#<%=lblfeecat.ClientID %>').text(data.d[0][11].toString());
+                    $('#<%=lblcontactNo.ClientID %>').text(data.d[0][8].toString());
+                    $('#<%=lblRouteNo.ClientID %>').text(data.d[0][15].toString());
+                    var status = data.d[0][9].toString();
+                    $('#<%=lblstatus.ClientID %>').text(status);
+                    if (status == "Active")
+                        $('#<%=lblstatus.ClientID %>').css("color", "Green");
+                        else
+                            $('#<%=lblstatus.ClientID %>').css("color", "Red");
+                    }
+                catch (e) {
+                    showErrorMsg(e);
+                }
+            },
+            failure: function (data) {
+                showErrorMsg("failure");
+            },
+            error: function (data) {
+                showErrorMsg("Error");
+            }
+        });
+        }
+
+        function getHeadDetails(studentid, voucherid) {
+            debugger;
+
+
+            $.ajax({
+                type: "POST",
+                contentType: "application/json; charset=utf-8",
+                url: "../CommonWebServiceNew.asmx/BindReceiptHeadDetails",
+                data: "{studentid:'" + studentid + "',voucherid:'" + voucherid + "'}",
+                dataType: "json",
+                success: function OnSuccess(data) {
+                    try {
+                        var headdetail = document.getElementById('headdetail');
+                        var tds = '';
+                        document.getElementById('lblrcptno').innerHTML = data.d[0][2];
+                        document.getElementById('lblrcptDate').innerHTML = data.d[0][3];
+                        for (var i = 0; i < data.d.length; i++) {
+                            tds = tds + '<tr><td>' + (i + 1).toString() + '</td><td>' + data.d[i][0] + '</td><td>' + data.d[i][1] + '</td></tr>';
+                        }
+                        headdetail.innerHTML = tds;
+                    }
+                    catch (e) {
+                        showErrorMsg(e);
+                    }
+                },
+                failure: function (data) {
+                    showErrorMsg("failure");
+                },
+                error: function (data) {
+                    showErrorMsg("Error");
+                }
+            });
+            return false;
+        }
+
+
+    </script>
