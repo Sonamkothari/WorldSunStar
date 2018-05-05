@@ -1,0 +1,29 @@
+   public byte[] StreamFileFromOnline(string OnlineFileFullPath)
+        {
+            MemoryStream stream = new MemoryStream();
+            //tryagain:
+            try
+            {
+                using (WebClient webClient = new WebClient())
+                {
+                    byte[] data = webClient.DownloadData(OnlineFileFullPath);
+                    stream = new MemoryStream(data);
+                }
+            }
+            catch (Exception ex)
+            {
+                ErrorWrite.ErrorWriting("BaseController.StreamFileFromOnline()", ex.Message + " /// " + ex.InnerException);
+                //      goto tryagain;
+            }
+            return stream.ToArray();
+        }
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+                            if (dr["StuPic"].ToString() != string.Empty && dr["StuPic"] != null)
+                        {
+                            //dt.Rows[count]["StuPhoto"] = controller.StreamFile(Server.MapPath(dr["StuPic"].ToString()));
+                            dt.Rows[count]["StuPhoto"] = controller.StreamFileFromOnline(DAL_AppConfiguration.RootUrl + dr["StuPic"].ToString().Replace("~/", ""));
+                        }
+------------------------------------------------------------------------------------------------------------------------------------------------------------------
+      
