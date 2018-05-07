@@ -1,3 +1,28 @@
+<?xml version="1.0"?>
+
+<!--
+  For more information on how to configure your ASP.NET application, please visit
+  http://go.microsoft.com/fwlink/?LinkId=169433
+  -->
+
+<configuration>
+    <system.web>
+        <compilation debug="true" targetFramework="4.0" />
+      <webServices>
+        <protocols>
+
+
+          <add name="HttpGet"/>
+        </protocols>
+      </webServices>
+    </system.web>
+<connectionStrings>
+    <add name="constr" connectionString="Data Source=Sona\Sonam;Initial Catalog=sonam;Integrated Security=True"/>
+  </connectionStrings>
+</configuration>
+-----------------------------------------------------------------------------------------------------------------------------------------------
+
+
 <%@ Page Language="C#" AutoEventWireup="true" CodeBehind="BindStateAndCity.aspx.cs" Inherits="WebApplication2.BindStateAndCity" %>
 
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
