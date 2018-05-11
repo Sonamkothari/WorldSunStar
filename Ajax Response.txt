@@ -22,14 +22,12 @@
 </configuration>
 -----------------------------------------------------------------------------------------------------------------------------------------------
 
+<%@ Page Language="C#" AutoEventWireup="true" CodeFile="Default.aspx.cs" Inherits="_Default" %>
 
-<%@ Page Language="C#" AutoEventWireup="true" CodeBehind="BindStateAndCity.aspx.cs" Inherits="WebApplication2.BindStateAndCity" %>
+<!DOCTYPE html>
 
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
- 
 <html xmlns="http://www.w3.org/1999/xhtml">
- 
-<head runat="server">
+<head id="Head1" runat="server">
     <title></title>
    <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
     <script type="text/javascript">
@@ -37,11 +35,12 @@
             debugger;
             $.ajax({
                 type: "GET",
-                url: "BindStateAndCity.aspx/GetCustomers",
-//                data: '{}',
+                url: "Default.aspx/GetCustomers",
                 contentType: "application/json; charset=utf-8",
                 dataType: "json",
                 success: function (r) {
+
+                  
                     var ddlstate = $("[id*=ddlstate]");
                     ddlstate.empty().append('<option selected="selected" value="0">Select State</option>');
                     $.each(r.d, function () {
@@ -50,25 +49,53 @@
                 }
             });
         });
-//        $(function () {
-//            debugger;
-//            $.get("/BindStateAndCity.aspx/GetCustomers", function (data, status) {
-//                alert(status);
-//            }
-//            )
-//        });
+    
+        function fnGetData() {
+            debugger;
+            var arr = JSON.parse(localStorage.getItem($("#ddlstate").find(":selected").val()));
+            if (arr != null && arr!="") {
+                var ddlcity = $("[id*=ddlcity]");
+                ddlcity.empty().append('<option selected="selected" value="0">Select City</option>');
+                $.each(arr, function () {
+                    ddlcity.append($("<option></option>").val(this['Value']).html(this['Text']));
+                });
+            }
+            else {
+                var s = $("#ddlstate").find(":selected").val();
 
+                $.ajax({
+                    type: "POST",
+                    url: "Default.aspx/GetCustomersDetails",
+                    data: "{state:'" + s + "'}",
+                    contentType: "application/json; charset=utf-8",
+                    dataType: "json",
+                    success: function (r) {
+                        debugger;
+                       localStorage.setItem($("#ddlstate").find(":selected").val(),JSON.stringify(r.d));
+                        var ddlstate = $("[id*=ddlcity]");
+                        ddlstate.empty().append('<option selected="selected" value="0">select City</option>');
+                        $.each(r.d, function () {
+                            ddlstate.append($("<option></option>").val(this['Value']).html(this['Text']));
+                        });
+                    }
+                });
+            }
+
+            //var ArrFinal=
+            //alert(window.localStorage.getItem($("#ddlstate").find(":selected").val()));    
+            
+        }   
     </script> 
      <script type="text/javascript">
          function GetBind() {
-            debugger;
-            var s = $("#ddlstate").find(":selected").text();
-            
+             //fnGetData();
+             debugger;
+             var s = $("#ddlstate").find(":selected").val();
+
              $.ajax({
                  type: "POST",
-                 url: "BindStateAndCity.aspx/GetCustomersDetails",
+                 url: "Default.aspx/GetCustomersDetails",
                  data: "{state:'" + s + "'}",
-               
                  contentType: "application/json; charset=utf-8",
                  dataType: "json",
                  success: function (r) {
@@ -89,7 +116,7 @@
     <tr>
     <td>Select State:</td>
     <td>
-      <asp:DropDownList ID="ddlstate" runat="server"  onchange="GetBind();" >
+      <asp:DropDownList ID="ddlstate" runat="server"  onchange="fnGetData();" >
           <asp:ListItem Value="0">Select State</asp:ListItem>
         </asp:DropDownList>
     </td>
@@ -109,6 +136,7 @@
     </form>
 </body>
 </html>
+
 -------------------------------------------------------------------------------------------------------------------------------
 
 using System;
