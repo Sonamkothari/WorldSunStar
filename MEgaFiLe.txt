@@ -1,0 +1,162 @@
+------------------Base Controller 
+ public string InsertUpdateDeleteUsingSP(string ProcedureName, Hashtable hash, SqlTransaction Newtransaction = null)
+        {
+            SqlCommand cmd= new SqlCommand();
+            string exeVal = "-1";
+            if (Newtransaction != null)
+            {
+                cmd.Transaction = Newtransaction;
+                cmd.Connection = Newtransaction.Connection;
+            }
+            else
+                cmd.Connection = con;
+
+            cmd.CommandText = ProcedureName;
+
+            if (hash.Count > 0)
+                foreach (string key in hash.Keys)
+                    cmd.Parameters.AddWithValue(key, hash[key]);
+
+            cmd.Parameters.Add("@RetVal", SqlDbType.VarChar, 500000).Direction = ParameterDirection.Output;
+            cmd.CommandType = CommandType.StoredProcedure;
+            if (Newtransaction == null)
+            {
+                if (con != null && con.State == ConnectionState.Closed)
+                    con.Open();
+            }
+            cmd.CommandTimeout = 80000000;
+            int i = cmd.ExecuteNonQuery();
+            exeVal = Convert.ToString(cmd.Parameters["@RetVal"].Value);
+            if (Newtransaction == null)
+            {
+                if (con != null && con.State == ConnectionState.Open)
+                {
+                    con.Close();
+                    //con.Dispose();
+                }
+            }
+
+            return exeVal;
+        }
+
+
+ public void FillDropdownlist(DataTable dt, DropDownList ddl, string TextColumnName, string ValueColumnName, string defaultText, string defaultValue)
+        {
+            try
+            {
+
+                ddl.Items.Clear();
+                ddl.SelectedIndex = -1;
+                ddl.DataTextField = TextColumnName;
+                ddl.DataValueField = ValueColumnName;
+                ddl.DataSource = dt;
+                ddl.DataBind();
+                if (defaultText != string.Empty)
+                {
+                    ddl.Items.Insert(0, new ListItem(defaultText, defaultValue));
+                    ddl.SelectedIndex = 0;
+                }
+            }
+            catch (Exception ex)
+            {
+                ErrorWrite.ErrorWriting("BaseController.FillDropdownlist()", ex.Message + " /// " + ex.InnerException);
+                throw;
+            }
+        }
+
+
+  BaseController controller = new BaseController();
+        ErrorHandling ErrorWrite = new ErrorHandling();
+        public string InsertUpdateDelete(BAL_FeeConcessionAgainstopening Prpaccession, BAL_InternalAudit auditPrp)
+        {
+            SqlTransaction transaction = controller.BeginTran();
+            Hashtable hash = new Hashtable();
+            string[] exeVal = { "-1" };
+            try
+            {
+                hash.Add("@Action", Prpaccession.Action);
+                hash.Add("@SchoolId", Prpaccession.SchoolId);
+                hash.Add("@SessionId", Prpaccession.SessionId);
+                hash.Add("@AdmnNo", Prpaccession.AdmnNo);
+                hash.Add("@FeeConcessionagaistOpening", Prpaccession.FeeConcessionagaistOpening);
+
+                exeVal = controller.InsertUpdateDeleteUsingSP("Erp_ManageFeeConcessionAgainstOpening", hash, transaction).Split(',');
+                if (exeVal[0] != "0")
+                {
+                    if (exeVal[0] != "-1")
+                    {
+                        auditPrp.RecordId = Convert.ToInt64(exeVal[0]);
+                        auditPrp.ActionDetails = exeVal[2];
+                        auditPrp.TableName = exeVal[1];
+                        new DAL_InternalAudit().InsertInternalAudit(auditPrp, transaction);
+                    }
+                }
+                controller.CommitTran(transaction);
+            }
+            catch (Exception ex)
+            {
+                controller.RoolBackTran(transaction);
+                ErrorWrite.ErrorWritinginDB("DAL_FeeConcessionAgainstopening.InsertUpdateAccession()", ex, "Erp_ManageFeeConcessionAgainstOpening");
+                throw ex;
+            }
+            return exeVal[0];
+        }
+
+     public SqlTransaction BeginTran()
+        {
+            SqlTransaction transaction;
+            if (con != null && con.State == ConnectionState.Closed)
+                con.Open();
+            return transaction = con.BeginTransaction();
+        }
+
+        public void RoolBackTran(SqlTransaction transaction)
+        {
+            try
+            {
+                transaction.Rollback();
+                if (con != null && con.State == ConnectionState.Open)
+                    con.Close();
+            }
+            catch (Exception ex)
+            {
+                ErrorWrite.ErrorWriting("BaseController.RoolBackTran()", ex.Message + " /// " + ex.InnerException);
+            }
+        }
+
+       public void CommitTran(SqlTransaction transaction)
+        {
+
+            transaction.Commit();
+            if (con != null && con.State == ConnectionState.Open)
+                con.Close();
+        }
+
+
+public string InsertInternalAudit(BAL_InternalAudit auditPrp, SqlTransaction transaction=null)
+        {
+            Hashtable hash = new Hashtable();
+            string exeVal = "-1";
+            try
+            {
+                hash.Add("@Action", "InsertInternalAudit");
+                hash.Add("@SchoolId", HttpContext.Current.Session["SchoolId"]);
+                hash.Add("@UserId", HttpContext.Current.Session["UserId"]);
+
+                hash.Add("@TableName", auditPrp.TableName);
+                hash.Add("@RecordId", auditPrp.RecordId);
+                hash.Add("@MenuId", HttpContext.Current.Session["MenuId"]);
+
+                hash.Add("@MenuName", HttpContext.Current.Session["MenuName"]);
+                hash.Add("@ProcessType", auditPrp.ProcessType);
+                hash.Add("@SystemIP", HttpContext.Current.Session["PublicClientIP"]);
+                hash.Add("@ActionDetails", auditPrp.ActionDetails);
+
+                exeVal = controller.InsertUpdateDeleteUsingSP("Erp_ManageInternalAudit", hash, transaction);
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
+            return exeVal;
+        }
