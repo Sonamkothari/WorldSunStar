@@ -1,0 +1,68 @@
+CTE
+CTE stands for Common Table expressions. 
+It was introduced with SQL Server 2005. 
+It is a temporary result set and typically it may be a result of complex sub-query. Unlike temporary table its life is limited to the current query.
+It is defined by using WITH statement. CTE improves readability and ease in maintenance of complex queries and sub-queries. 
+Always begin CTE with semicolon.
+--------------------------------------------------------------
+A sub query without CTE is given below :
+SELECT * FROM (
+ SELECT Addr.Address, Emp.Name, Emp.Age From Address Addr
+ Inner join Employee Emp on Emp.EID = Addr.EID) Temp
+WHERE Temp.Age > 50
+ORDER BY Temp.NAME
+
+---------------------------------------------------------------
+By using CTE above query can be re-written as follows :
+;With CTE1(Address, Name, Age)--Column names for CTE, which are optional
+AS
+(
+SELECT Addr.Address, Emp.Name, Emp.Age from Address Addr
+INNER JOIN EMP Emp ON Emp.EID = Addr.EID
+)
+SELECT * FROM CTE1 --Using CTE 
+WHERE CTE1.Age > 50
+ORDER BY CTE1.NAME
+
+
+
+
+------------------------------------------------------------------------------------------------------------
+CREATE TABLE Employee([EID] [int] IDENTITY(10,5) NOT NULL,[Name] [varchar](50) NULL)
+
+insert into Employee(Name) values('Neeraj')
+insert into Employee(Name) values('dheeraj')
+insert into Employee(Name) values('shayam')
+insert into Employee(Name) values('vikas')
+insert into Employee(Name) values('raj')
+
+CREATE TABLE DEPT(EID INT,DEPTNAME VARCHAR(100))
+insert into dept values(10,'IT')
+insert into dept values(15,'Finance')
+insert into dept values(20,'Admin')
+insert into dept values(25,'HR')
+insert into dept values(10,'Payroll')
+I have created two tables employee and Dept and inserted 5 rows in each table. Now I would like to join these tables and create a temporary result set to use it further.
+
+With CTE_Example(EID,Name,DeptName)
+as
+(
+select Employee.EID,Name,DeptName from Employee 
+inner join DEPT on Employee.EID =DEPT.EID
+)
+select * from CTE_Example
+Lets take each line of the statement one by one and understand.
+
+To define CTE we write "with" clause, then we give a name to the table expression, here I have given name as "CTE_Example"
+
+Then we write "As" and enclose our code in two brackets (---), we can join multiple tables in the enclosed brackets.
+
+In the last line, I have used "Select * from CTE_Example" , we are referring the Common table expression in the last line of code, So we can say that Its like a view, where we are defining and using the view in a single batch and CTE is not stored in the database as a permanent object. But it behaves like a view. we can perform delete and update statement on CTE and that will have direct impact on the referenced table those are being used in CTE. Lets take an example to understand this fact.
+
+With CTE_Example(EID,DeptName)
+as
+(
+select EID,DeptName from DEPT 
+)
+delete from CTE_Example where EID=10 and DeptName ='Payroll'
+In the above statement we are deleting a row from CTE_Example and it will delete the data from the referenced table "DEPT" that is being used in the CTE.
