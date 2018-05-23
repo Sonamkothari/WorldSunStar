@@ -1,0 +1,15 @@
+<script type="text/javascript">
+        function ValidateGrid() {
+            debugger;
+            var rows = document.getElementById("<%= RepDetails.ClientID %>").rows;
+            var tbl_row = rows.length;
+            var tbl_col = document.getElementById("<%= RepDetails.ClientID %>").rows[0].cells.length;
+            for (var i = 0; i <= tbl_row; i++) {
+                if (parseFloat($('#ContentPlaceHolder1_RepDetails_lblAmount_' + i).text()) < parseFloat($('#ContentPlaceHolder1_RepDetails_txtAmount_' + i).val())) {
+                    $('#ContentPlaceHolder1_RepDetails_txtAmount_' + i).val('0.00');
+                    validateError('ContentPlaceHolder1_RepDetails_txtAmount_' + i, "Amount should be less than Due Amount");
+                    return false;
+                }
+            }
+        }
+    </script>
