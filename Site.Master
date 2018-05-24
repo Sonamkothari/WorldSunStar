@@ -1,0 +1,54 @@
+﻿<%@ Master Language="C#" AutoEventWireup="true" CodeBehind="Site.master.cs" Inherits="RolesModule.SiteMaster" %>
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+<head runat="server">
+    <title></title>
+    <link href="~/Styles/Site.css" rel="stylesheet" type="text/css" />
+    <asp:ContentPlaceHolder ID="HeadContent" runat="server">
+    </asp:ContentPlaceHolder>
+</head>
+<body>
+    <form runat="server">
+    <div class="page">
+        <div class="header">
+            <div class="title">
+                <h1>
+                    My Role Manager
+                </h1>
+            </div>
+            <div class="loginDisplay">
+            </div>
+            <div class="clear hideSkiplink">
+                <asp:Menu ID="NavigationMenu" runat="server" CssClass="menu" EnableViewState="false"
+                    IncludeStyleBlock="false" Orientation="Horizontal">
+                    <Items>
+                        <asp:MenuItem NavigateUrl="~/AddRoles.aspx" Text="Add Roles" />
+                        <asp:MenuItem NavigateUrl="~/AddUsers.aspx" Text="Assign Role to Users" />
+                        <asp:MenuItem NavigateUrl="~/AddMenu.aspx" Text="Add Menu" />
+                        <asp:MenuItem NavigateUrl="~/AddSubMenu.aspx" Text="Add SubMenu" />
+                        <asp:MenuItem NavigateUrl="~/AssignRoleToUser.aspx" Text="Save User Roles " />
+                        <asp:MenuItem NavigateUrl="~/EditMenu.aspx" Text="Edit Menu" />
+                        <asp:MenuItem NavigateUrl="~/Login.aspx" Text="Login test" />
+                    </Items>
+                </asp:Menu>
+            </div>
+        </div>
+        <div class="main">
+            <asp:ContentPlaceHolder ID="MainContent" runat="server" />
+        </div>
+        <div class="clear">
+        </div>
+        <div class="header">
+            <div class="title">
+                <h1>
+                    By :- Sai
+                </h1>
+            </div>
+        </div>
+    </div>
+    <div class="footer">
+    </div>
+    </form>
+</body>
+</html>
