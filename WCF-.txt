@@ -1,0 +1,19 @@
+1. Web services use XMLSerializer which does not specify which fields or properties of the type are serialized into XML, while WCF uses DataContratSerializer that shows which fields or properties are serialized into XML. That’s why WCF is preferred over web services, as DataContratSerializer performs better than XMLSerializer.
+
+2. Web services support only one protocol- HTTP and HTTPS during communication, but WCF supports more protocols like- HTTP, TCP and MSMQ that can be extended for comprehensive solution, reliable session and transactions. It signifies WCF is more adaptable to work together for variety of software.
+
+3. WCF offers much flexibility as web services can only be hosted in IIS, while WCF can be hosted in IIS, windows activation services, self hosting and Windows services.
+
+4. WCF is excellent for building real-time applications because it’s more reliable, fast and robust as compared to the web services.
+
+5. Web services perform far better than WCF services even when they both execute same actions.
+
+6. ASP.NET web services don’t support duplex operations but WCF does.
+
+7. When WCF development services are used, the hash table can be serialized, but not when using web services. Web services serialize only those collections that incorporate IEnumerable and ICollection.
+
+8. Using service behavior classes, WCF supports multi-threading, but web services doesn’t.
+
+9. In ASP.NET web services, SOAP messages are exchanged over HTTP, but WCF services can exchange the message using any format over any transport protocol. Though, SOAP is default format that WCF uses.
+
+10. WCF services have timeouts by default that can be configured. In WCF services, if communication channel cannot be opened/ closed and there is no response within the time span, then WCF services get timed-out. Web services don’t have any such property.
