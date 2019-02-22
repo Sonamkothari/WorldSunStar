@@ -1,0 +1,22 @@
+Content Management Systems(CMS)
+Server-side Programming Languages
+Client-side Programming Languages
+JavaScript Libraries
+Markup Languages
+Character Encodings
+Image file formate
+Site Element
+Structure Data Formate
+SSL Certificate Authorities
+Social Widgets
+JavaScript Content Delivery Networks
+Traffic Analysis Tools
+Advertising Networks
+Tag Managers
+Web Servers
+OS
+Web Hosting Providers
+Reverse Proxy Services
+Top Level Domains
+Server Locations
+Content Languages
